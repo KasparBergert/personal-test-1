@@ -1,0 +1,10 @@
+purpose is to make a project that works exactly like icertific - but in rust
+
+basic things.
+
+auth for users
+JWT
+
+make a simple frontend where the user can see his certificates.
+
+when a user creates certificates. there is a crontab which checks them and sends an email to him.
