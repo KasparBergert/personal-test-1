@@ -1,16 +1,16 @@
-use std::{fs, sync::Mutex};
+use std::sync::Mutex;
 
-use actix_web::{App, HttpResponse, HttpServer, Responder, get, web};
-use sqlite::Connection;
+use actix_web::{App, HttpServer, web};
+use serde::{Deserialize, Serialize};
 
-async fn register(db: web::Data<Connection>) -> impl Responder {
-    // Use the connection here
-    "register"
-}
+mod auth;
 
-async fn login(db: web::Data<Connection>) -> impl Responder {
-    // Use the connection here
-    "login"
+use auth::{login, register};
+
+#[derive(Deserialize, Serialize)]
+pub(crate) struct User {
+    name: String,
+    password: String,
 }
 
 #[actix_web::main]
@@ -24,14 +24,15 @@ async fn main() -> std::io::Result<()> {
     ";
 
     let db = sqlite::open("./database.db").unwrap();
+    db.execute(init).unwrap();
 
     let data = web::Data::new(Mutex::new(db));
 
     HttpServer::new(move || {
         App::new()
             .app_data(data.clone())
-            .route("/get", web::post().to(register))
-            .route("/get", web::post().to(login))
+            .route("/register", web::post().to(register))
+            .route("/login", web::post().to(login))
     })
     .bind(("127.0.0.1", 8080))?
     .run()

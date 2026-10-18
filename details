@@ -8,3 +8,23 @@ JWT
 make a simple frontend where the user can see his certificates.
 
 when a user creates certificates. there is a crontab which checks them and sends an email to him.
+
+login has to create webtokens and sends both to the user.
+a middleware checks if they are valid.
+
+refreshtoken endpoint so users don't have to log in all the time.
+
+jwt is only used for auth.
+there is a struct which is serialized and deserialized
+called JWT.
+
+to deserialize JWT.
+
+useful function would be serde.
+
+tell serde that this data needs to be parsed into JWT.
+and it does so. inside it it verifies that it's a jwt.
+verifies the hash. and makes it into that struct.
+
+could also make a serializer for that struct.
+given all the struct data. it makes it into a jwt.
