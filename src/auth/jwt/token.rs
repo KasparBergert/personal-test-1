@@ -3,12 +3,11 @@ use hmac::{Hmac, KeyInit, Mac};
 use serde::{Deserialize, Serialize};
 use sha2::Sha256;
 
-const ACCESS_KEY: &str = "ACCESS";
-const REFRESH_KEY: &str = "REFRESH";
+use crate::auth::jwt::{ACCESS_KEY, REFRESH_KEY};
 
 #[derive(Serialize, Deserialize)]
 pub struct JWT<T> {
-    data: T,
+    pub data: T,
 }
 
 pub enum JWTType {
@@ -70,6 +69,7 @@ impl std::error::Error for JWTError {}
 
 //implement serialize for JWT.
 impl<T: serde::Serialize> JWT<T> {
+    /** creates jwt into a string */
     pub fn to_jwt_string(&self, typ: JWTType) -> Result<String, JWTError> {
         let json = serde_json::to_string(&self.data).map_err(|_| JWTError::SerializationFailed)?;
 
@@ -91,6 +91,7 @@ impl<T: serde::Serialize> JWT<T> {
 }
 
 impl<T: serde::de::DeserializeOwned> JWT<T> {
+    /** validates and returns contents of jwt */
     pub fn from_string_to_jwt(input: &str, typ: JWTType) -> Result<Self, JWTError> {
         let (signature, payload) = input.split_once('.').ok_or(JWTError::InvalidFormat)?;
 

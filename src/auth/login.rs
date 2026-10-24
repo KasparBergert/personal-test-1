@@ -1,31 +1,29 @@
 use crate::{
     User,
-    auth::jwt::{JWT, JWTError, JWTType},
+    auth::{
+        AuthDTO,
+        jwt::{ACCESS_TOKEN_COOKIE_NAME, JWT, JWTError, JWTType, REFRESH_TOKEN_COOKIE_NAME},
+    },
 };
 use actix_web::{
-    Error, HttpResponse, Responder,
+    HttpResponse, Responder,
     cookie::{Cookie, SameSite},
     web,
 };
-use serde::{Deserialize, Serialize};
+
 use sqlite::Connection;
 use std::sync::Mutex;
-
-#[derive(Serialize, Deserialize)]
-struct AuthDTO {
-    name: String,
-}
 
 fn create_tokens<'a>(token: JWT<AuthDTO>) -> Result<(Cookie<'a>, Cookie<'a>), JWTError> {
     let refresh = token.to_jwt_string(JWTType::Refresh)?;
     let access = token.to_jwt_string(JWTType::Access)?;
 
-    let refresh_cookie = Cookie::build("refresh_token", refresh)
+    let refresh_cookie = Cookie::build(REFRESH_TOKEN_COOKIE_NAME, refresh)
         .http_only(true)
         .secure(false)
         .same_site(SameSite::Strict)
         .finish();
-    let access_cookie = Cookie::build("access_token", access)
+    let access_cookie = Cookie::build(ACCESS_TOKEN_COOKIE_NAME, access)
         .http_only(true)
         .secure(false)
         .same_site(SameSite::Strict)
