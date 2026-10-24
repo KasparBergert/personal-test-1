@@ -1,9 +1,9 @@
 use crate::{
     User,
-    auth::jwt::{JWT, JWTType},
+    auth::jwt::{JWT, JWTError, JWTType},
 };
 use actix_web::{
-    HttpResponse, Responder,
+    Error, HttpResponse, Responder,
     cookie::{Cookie, SameSite},
     web,
 };
@@ -14,6 +14,24 @@ use std::sync::Mutex;
 #[derive(Serialize, Deserialize)]
 struct AuthDTO {
     name: String,
+}
+
+fn create_tokens<'a>(token: JWT<AuthDTO>) -> Result<(Cookie<'a>, Cookie<'a>), JWTError> {
+    let refresh = token.to_jwt_string(JWTType::Refresh)?;
+    let access = token.to_jwt_string(JWTType::Access)?;
+
+    let refresh_cookie = Cookie::build("refresh_token", refresh)
+        .http_only(true)
+        .secure(false)
+        .same_site(SameSite::Strict)
+        .finish();
+    let access_cookie = Cookie::build("access_token", access)
+        .http_only(true)
+        .secure(false)
+        .same_site(SameSite::Strict)
+        .finish();
+
+    Ok((refresh_cookie, access_cookie))
 }
 
 pub async fn login(body: web::Json<User>, db: web::Data<Mutex<Connection>>) -> impl Responder {
@@ -40,34 +58,14 @@ pub async fn login(body: web::Json<User>, db: web::Data<Mutex<Connection>>) -> i
         return HttpResponse::BadRequest().body("Could not log in");
     }
 
-    let token = JWT::new(AuthDTO { name: body.name });
-
-    let refresh = match token.to_jwt_string(JWTType::Refresh) {
-        Ok(val) => val,
+    let jwt = JWT::new(AuthDTO { name: body.name });
+    let (refresh_cookie, access_cookie) = match create_tokens(jwt) {
+        Ok(cookies) => cookies,
         Err(err) => {
-            println!("{:?}", err.to_string());
-            return HttpResponse::Forbidden().finish();
+            println!("{}", err);
+            return HttpResponse::new(err.status_code());
         }
     };
-
-    let access = match token.to_jwt_string(JWTType::Access) {
-        Ok(val) => val,
-        Err(err) => {
-            println!("{:?}", err.to_string());
-            return HttpResponse::Forbidden().finish();
-        }
-    };
-
-    let refresh_cookie = Cookie::build("refresh_token", refresh)
-        .http_only(true)
-        .secure(false)
-        .same_site(SameSite::Strict)
-        .finish();
-    let access_cookie = Cookie::build("access_token", access)
-        .http_only(true)
-        .secure(false)
-        .same_site(SameSite::Strict)
-        .finish();
 
     HttpResponse::Ok()
         .cookie(refresh_cookie)

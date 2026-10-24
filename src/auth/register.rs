@@ -9,9 +9,6 @@ pub async fn register(body: web::Json<User>, db: web::Data<Mutex<Connection>>) -
     let body = body.into_inner();
     let db = db.lock().unwrap();
 
-    println!("{:?}", body.name);
-    println!("{:?}", body.password);
-
     let mut statement = db
         .prepare("INSERT INTO users (name, password) VALUES (?, ?)")
         .unwrap();
