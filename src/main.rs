@@ -1,6 +1,5 @@
 use std::sync::Mutex;
 
-use actix_web::middleware::from_fn;
 use actix_web::{App, HttpServer, web};
 use serde::{Deserialize, Serialize};
 
@@ -8,7 +7,6 @@ mod auth;
 
 use auth::{login, register};
 
-use crate::auth::jwt_auth;
 
 #[derive(Deserialize, Serialize)]
 pub(crate) struct User {
