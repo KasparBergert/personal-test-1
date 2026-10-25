@@ -46,11 +46,9 @@ mod tests {
 
     #[actix_web::test]
     async fn valid_access_cookie_passes_through_middleware() {
-        let token = JWT::new(AuthDTO {
-            name: "Kaspar".to_owned(),
-        })
-        .to_jwt_string(super::super::JWTType::Access)
-        .unwrap();
+        let token = JWT::new(AuthDTO { id: 69420 })
+            .to_jwt_string(super::super::JWTType::Access)
+            .unwrap();
 
         let app = test::init_service(App::new().wrap(from_fn(jwt_auth)).route(
             "/",

@@ -56,7 +56,7 @@ pub async fn login(body: web::Json<User>, db: web::Data<Mutex<Connection>>) -> i
         return HttpResponse::BadRequest().body("Could not log in");
     }
 
-    let jwt = JWT::new(AuthDTO { name: body.name });
+    let jwt = JWT::new(AuthDTO { id: body.name });
     let (refresh_cookie, access_cookie) = match create_tokens(jwt) {
         Ok(cookies) => cookies,
         Err(err) => {
