@@ -11,7 +11,7 @@ use actix_web::{
     web,
 };
 
-use sqlite::Connection;
+use sqlite::{Connection, State};
 use std::sync::Mutex;
 
 fn create_tokens<'a>(token: JWT<AuthDTO>) -> Result<(Cookie<'a>, Cookie<'a>), JWTError> {
@@ -36,27 +36,39 @@ pub async fn login(body: web::Json<User>, db: web::Data<Mutex<Connection>>) -> i
     let body = body.into_inner();
     let db = db.lock().unwrap();
 
-    let statement = db
-        .prepare("SELECT password FROM users WHERE name = ?")
+    let mut statement = db
+        .prepare("SELECT password FROM users WHERE name = ?;")
         .unwrap();
 
-    let mut rows = match statement.into_iter().bind((1, body.name.as_str())) {
-        Ok(rows) => rows,
-        Err(error) => return HttpResponse::InternalServerError().body(error.to_string()),
+    statement.bind((1, body.name.as_str()));
+
+    let password = match statement.next() {
+        Ok(State::Row) => match statement.read::<String, _>(0) {
+            Ok(password) => password,
+            Err(_) => return HttpResponse::InternalServerError().body("Database error"),
+        },
+        Ok(State::Done) => return HttpResponse::BadRequest().body("Could not log in"),
+        Err(_) => return HttpResponse::InternalServerError().body("Database error"),
     };
 
-    let row = match rows.next() {
-        Some(Ok(row)) => row,
-        Some(Err(error)) => return HttpResponse::InternalServerError().body(error.to_string()),
-        None => return HttpResponse::BadRequest().body("User not found"),
-    };
-
-    let password = row.read::<&str, _>(0);
     if password != body.password {
         return HttpResponse::BadRequest().body("Could not log in");
     }
 
-    let jwt = JWT::new(AuthDTO { id: body.name });
+    //get the id of the user
+    let mut statement = db.prepare("SELECT id FROM users WHERE name = ?;").unwrap();
+    statement.bind((1, body.name.as_str()));
+
+    let id = match statement.next() {
+        Ok(State::Row) => match statement.read::<i64, _>(0) {
+            Ok(id) => id,
+            Err(_) => return HttpResponse::InternalServerError().body("Database error"),
+        },
+        Ok(State::Done) => return HttpResponse::BadRequest().body("Could not log in"),
+        Err(_) => return HttpResponse::InternalServerError().body("Database error"),
+    };
+
+    let jwt = JWT::new(AuthDTO { id });
     let (refresh_cookie, access_cookie) = match create_tokens(jwt) {
         Ok(cookies) => cookies,
         Err(err) => {
