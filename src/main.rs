@@ -1,6 +1,8 @@
 mod auth;
 mod certificate;
 mod db;
+#[cfg(test)]
+mod test_utils;
 
 use actix_web::{App, HttpServer, middleware::from_fn, web};
 use auth::{jwt_auth, login, register};

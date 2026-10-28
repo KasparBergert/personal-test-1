@@ -1,41 +1,10 @@
 use super::*;
-use crate::{
-    DB_INIT,
-    auth::{ACCESS_TOKEN_COOKIE_NAME, AuthDTO, JWT, JWTType, jwt_auth},
-};
-use actix_web::{App, cookie::Cookie, http::StatusCode, test, web};
-use std::sync::Mutex;
-
-macro_rules! init_test {
-    () => {{
-        let db = sqlite::open(":memory:").unwrap();
-        db.execute(DB_INIT).unwrap();
-        let conn = web::Data::new(Mutex::new(db));
-
-        test::init_service(
-            App::new()
-                .app_data(conn.clone())
-                .service(
-                    web::resource("/certificate")
-                        .wrap(actix_web::middleware::from_fn(jwt_auth))
-                        .route(web::get().to(get_certificate))
-                        .route(web::post().to(create_certificate))
-                        .route(web::put().to(edit_certificate))
-                        .route(web::delete().to(delete_certificate)),
-                )
-                .service(
-                    web::resource("/certificate/all")
-                        .wrap(actix_web::middleware::from_fn(jwt_auth))
-                        .route(web::get().to(get_all_certificates)),
-                ),
-        )
-        .await
-    }};
-}
+use crate::auth::{ACCESS_TOKEN_COOKIE_NAME, AuthDTO, JWT, JWTType};
+use actix_web::{cookie::Cookie, http::StatusCode, test};
 
 #[actix_web::test]
 async fn owner_can_get_their_certificate_but_not_another_users_certificate() {
-    let app = init_test!();
+    let app = crate::init_test!();
 
     let owner_token = JWT::new(AuthDTO { id: 1 })
         .to_jwt_string(JWTType::Access)
@@ -106,7 +75,7 @@ async fn owner_can_get_their_certificate_but_not_another_users_certificate() {
 
 #[actix_web::test]
 async fn get_all_certificates_returns_only_certificates_owned_by_authenticated_user() {
-    let app = init_test!();
+    let app = crate::init_test!();
 
     let owner = JWT::new(AuthDTO { id: 1 })
         .to_jwt_string(JWTType::Access)
@@ -161,7 +130,7 @@ async fn get_all_certificates_returns_only_certificates_owned_by_authenticated_u
 
 #[actix_web::test]
 async fn owner_can_edit_their_certificate_but_another_user_cannot_change_it() {
-    let app = init_test!();
+    let app = crate::init_test!();
 
     let owner = JWT::new(AuthDTO { id: 1 })
         .to_jwt_string(JWTType::Access)
@@ -223,7 +192,7 @@ async fn owner_can_edit_their_certificate_but_another_user_cannot_change_it() {
 
 #[actix_web::test]
 async fn owner_can_delete_their_certificate_but_another_user_cannot_delete_it() {
-    let app = init_test!();
+    let app = crate::init_test!();
 
     let owner = JWT::new(AuthDTO { id: 1 })
         .to_jwt_string(JWTType::Access)
