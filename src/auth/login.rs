@@ -40,7 +40,7 @@ pub async fn login(body: web::Json<User>, db: web::Data<Mutex<Connection>>) -> i
         .prepare("SELECT password FROM users WHERE name = ?;")
         .unwrap();
 
-    statement.bind((1, body.name.as_str()));
+    let _ = statement.bind((1, body.name.as_str()));
 
     let password = match statement.next() {
         Ok(State::Row) => match statement.read::<String, _>(0) {
@@ -57,7 +57,7 @@ pub async fn login(body: web::Json<User>, db: web::Data<Mutex<Connection>>) -> i
 
     //get the id of the user
     let mut statement = db.prepare("SELECT id FROM users WHERE name = ?;").unwrap();
-    statement.bind((1, body.name.as_str()));
+    let _ = statement.bind((1, body.name.as_str()));
 
     let id = match statement.next() {
         Ok(State::Row) => match statement.read::<i64, _>(0) {

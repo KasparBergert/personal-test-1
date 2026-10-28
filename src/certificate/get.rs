@@ -24,7 +24,7 @@ pub(crate) async fn get_certificate(
         .prepare("SELECT * FROM certificates where user_id = ? AND id = ?;")
         .unwrap();
 
-    statement
+    let _ = statement
         .bind((1, auth.id))
         .and_then(|_| statement.bind((2, certificate.id)));
 
@@ -69,7 +69,7 @@ pub(crate) async fn get_all_certificates(
         .prepare("SELECT * FROM certificates where user_id = ?")
         .unwrap();
 
-    statement
+    let _ = statement
         .bind((1, auth.id))
         .and_then(|_| statement.bind((2, certificate.id)));
 

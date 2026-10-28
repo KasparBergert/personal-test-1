@@ -26,7 +26,7 @@ pub(crate) async fn edit_certificate(
         )
         .unwrap();
 
-    statement
+    let _ = statement
         .bind((1, certificate.title.as_str()))
         .and_then(|_| statement.bind((2, certificate.description.as_str())))
         .and_then(|_| statement.bind((3, certificate.id)))

@@ -22,7 +22,7 @@ pub(crate) async fn delete_certificate(
         .prepare("DELETE FROM certificates WHERE id = ? AND user_id = ? RETURNING id;")
         .unwrap();
 
-    statement
+    let _ = statement
         .bind((1, certificate.id))
         .and_then(|_| statement.bind((2, auth.id)));
 
