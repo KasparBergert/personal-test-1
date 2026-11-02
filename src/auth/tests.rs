@@ -1,7 +1,4 @@
-use crate::{
-    User,
-    auth::{ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME},
-};
+use crate::auth::{ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME, User};
 use actix_web::{http::header, test};
 
 #[actix_web::test]

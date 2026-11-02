@@ -4,3 +4,9 @@ use serde::{Deserialize, Serialize};
 pub struct AuthDTO {
     pub id: i64,
 }
+
+#[derive(Deserialize, Serialize)]
+pub(crate) struct User {
+    pub name: String,
+    pub password: String,
+}

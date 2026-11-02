@@ -4,19 +4,27 @@ mod db;
 #[cfg(test)]
 mod test_utils;
 
-use actix_web::{App, HttpServer, middleware::from_fn, web};
+use actix_web::{
+    App, HttpServer,
+    cookie::time::format_description::well_known::iso8601::FormattedComponents::DateTime,
+    middleware::from_fn, web,
+};
 use auth::{jwt_auth, login, register};
 use certificate::{
     create_certificate, delete_certificate, edit_certificate, get_all_certificates, get_certificate,
 };
+use chrono::{Local, Timelike};
 use db::DB_INIT;
 use serde::{Deserialize, Serialize};
-use std::sync::Mutex;
+use sqlite::Connection;
+use std::{sync::Mutex, thread};
+use tokio::spawn;
 
-#[derive(Deserialize, Serialize)]
-pub(crate) struct User {
-    name: String,
-    password: String,
+async fn send_emails(db: web::Data<Mutex<Connection>>) {
+    //get certificates whos status is firing or on_edge
+    //and get user emails of who created the certificates
+
+    //create emails that are tailored to the warning
 }
 
 #[actix_web::main]
@@ -25,6 +33,17 @@ async fn main() -> std::io::Result<()> {
     db.execute(DB_INIT).unwrap();
 
     let data = web::Data::new(Mutex::new(db));
+    let data2 = data.clone();
+    tokio::spawn(async move {
+        loop {
+            tokio::time::sleep(std::time::Duration::from_secs(60)).await;
+
+            let time = Local::now();
+            if time.hour() == 3 && time.minute() < 2 {
+                send_emails(data2.clone()).await
+            }
+        }
+    });
 
     HttpServer::new(move || {
         App::new()

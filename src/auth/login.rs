@@ -1,9 +1,6 @@
-use crate::{
-    User,
-    auth::{
-        AuthDTO,
-        jwt::{ACCESS_TOKEN_COOKIE_NAME, JWT, JWTError, JWTType, REFRESH_TOKEN_COOKIE_NAME},
-    },
+use crate::auth::{
+    AuthDTO, User,
+    jwt::{ACCESS_TOKEN_COOKIE_NAME, JWT, JWTError, JWTType, REFRESH_TOKEN_COOKIE_NAME},
 };
 use actix_web::{
     HttpResponse, Responder,

@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 
-use crate::User;
+use crate::auth::User;
 use actix_web::{HttpResponse, Responder, web};
 use sqlite::Connection;
 
