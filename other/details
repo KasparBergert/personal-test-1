@@ -1,0 +1,24 @@
+purpose is to make a project that works exactly like icertific - but in rust
+
+basic things.
+
+auth for users
+JWT
+
+make a simple frontend where the user can see his certificates.
+
+when a user creates certificates. there is a crontab which checks them and sends an email to him.
+
+login has to create webtokens and sends both to the user.
+a middleware checks if they are valid.
+
+refreshtoken endpoint so users don't have to log in all the time.
+
+refactor login endpoint to look smoother. it has too many moving parts in one...
+add middleware that authenitcates the user. uses only cookies.
+
+add endpoint that creates a certificate
+CRUD for creating certificates
+
+Reflection 1:
+Learning about stuff that has been an extremely difficult experience because there are a lot of low level stuff that I don't understand properly. I always have to have Apache BT4. Usually what happens is they give me an answer and I think I could have never figured that out using bare-looking patient. I think it is. I am not at a level of understanding how computers work. Not low enough. I don't know how this works, but I don't understand why it works that way. I guess that's the thing with the inner vector. For example, where does reference string hold its length in the reference? I still don't understand why. Okay. implementing features using the memories of another household. Basically, I don't have any strong base that I could use to keep writing those. Yeah, that's the thing. I don't have a good base. I mean, the way I count a good base is if I write a trust code and understand it more often. or you can switch.

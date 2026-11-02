@@ -73,3 +73,6 @@ every day it should look through all the certificates. see which ones are about 
 create specific, on-edge, firing emails.
 send the emails
 keep track of who received the emails lately, so emails are not sent again the next day
+
+launch a seperate thread that waits until its a specific time.
+when its time, it does the necessary setup to start sending emails.
