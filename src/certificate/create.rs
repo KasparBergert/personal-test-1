@@ -19,13 +19,16 @@ pub(crate) async fn create_certificate(
     let db = db.lock().unwrap();
 
     let mut statement = db
-        .prepare("INSERT INTO certificates (user_id, title, description) VALUES (?, ?, ?)")
+        .prepare(
+            "INSERT INTO certificates (user_id, title, description, expires_at) VALUES (?, ?, ?, ?)",
+        )
         .unwrap();
 
     let result = statement
         .bind((1, auth.id))
         .and_then(|_| statement.bind((2, certificate.title.as_str())))
         .and_then(|_| statement.bind((3, certificate.description.as_str())))
+        .and_then(|_| statement.bind((4, certificate.expires_at.as_str())))
         .and_then(|_| statement.next());
 
     let _result = match result {

@@ -9,4 +9,6 @@ pub struct AuthDTO {
 pub(crate) struct User {
     pub name: String,
     pub password: String,
+    #[serde(default)]
+    pub email: Option<String>,
 }

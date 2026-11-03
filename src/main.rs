@@ -1,6 +1,7 @@
 mod auth;
 mod certificate;
 mod db;
+mod notification;
 #[cfg(test)]
 mod test_utils;
 
@@ -15,17 +16,21 @@ use certificate::{
 };
 use chrono::{Local, Timelike};
 use db::DB_INIT;
+use notification::send_expiry_notifications;
+use reqwest::{Error, Response};
 use serde::{Deserialize, Serialize};
 use sqlite::Connection;
-use std::{sync::Mutex, thread};
+use std::{
+    sync::Mutex,
+    thread,
+    time::{SystemTime, UNIX_EPOCH},
+    vec,
+};
 use tokio::spawn;
 
-async fn send_emails(db: web::Data<Mutex<Connection>>) {
-    //get certificates whos status is firing or on_edge
-    //and get user emails of who created the certificates
+use crate::{auth::User, certificate::Certificate};
 
-    //create emails that are tailored to the warning
-}
+//email of user and certificate
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -40,7 +45,9 @@ async fn main() -> std::io::Result<()> {
 
             let time = Local::now();
             if time.hour() == 3 && time.minute() < 2 {
-                send_emails(data2.clone()).await
+                if let Err(err) = send_expiry_notifications(data2.clone()).await {
+                    eprintln!("{:?}", err);
+                }
             }
         }
     });

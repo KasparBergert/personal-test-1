@@ -82,15 +82,17 @@ pub(crate) async fn get_all_certificates(
                     statement.read::<i64, _>("id"),
                     statement.read::<String, _>("title"),
                     statement.read::<String, _>("description"),
+                    statement.read::<i64, _>("expires_at"),
                 );
 
                 match certificate {
-                    (Ok(id), Ok(title), Ok(description)) => {
+                    (Ok(id), Ok(title), Ok(description), Ok(expires_at)) => {
                         certificates.push(Certificate {
                             id,
                             title,
                             user_id: auth.id,
                             description,
+                            expires_at: expires_at.to_string(),
                         });
                     }
                     _ => {

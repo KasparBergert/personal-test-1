@@ -2,6 +2,15 @@ use super::*;
 use crate::auth::{ACCESS_TOKEN_COOKIE_NAME, AuthDTO, JWT, JWTType};
 use actix_web::{cookie::Cookie, http::StatusCode, test};
 
+fn test_certificate_dto() -> CertificateDTO {
+    CertificateDTO {
+        id: 0,
+        title: String::new(),
+        description: String::new(),
+        expires_at: "2000000000".into(),
+    }
+}
+
 #[actix_web::test]
 async fn owner_can_get_their_certificate_but_not_another_users_certificate() {
     let app = crate::init_test!();
@@ -18,6 +27,7 @@ async fn owner_can_get_their_certificate_but_not_another_users_certificate() {
         id: 0,
         title: "Rust certificate".into(),
         description: "Owned by owner".into(),
+        ..test_certificate_dto()
     };
     test::call_service(
         &app,
@@ -33,6 +43,7 @@ async fn owner_can_get_their_certificate_but_not_another_users_certificate() {
         id: 0,
         title: "Other certificate".into(),
         description: "Owned by other user".into(),
+        ..test_certificate_dto()
     };
     test::call_service(
         &app,
@@ -98,6 +109,7 @@ async fn get_all_certificates_returns_only_certificates_owned_by_authenticated_u
                     id: 0,
                     title: title.into(),
                     description: String::new(),
+                    ..test_certificate_dto()
                 })
                 .to_request(),
         )
@@ -113,6 +125,7 @@ async fn get_all_certificates_returns_only_certificates_owned_by_authenticated_u
                 id: 0,
                 title: String::new(),
                 description: String::new(),
+                ..test_certificate_dto()
             })
             .to_request(),
     )
@@ -148,6 +161,7 @@ async fn owner_can_edit_their_certificate_but_another_user_cannot_change_it() {
                 id: 0,
                 title: "Original".into(),
                 description: "Original description".into(),
+                ..test_certificate_dto()
             })
             .to_request(),
     )
@@ -161,6 +175,7 @@ async fn owner_can_edit_their_certificate_but_another_user_cannot_change_it() {
                 id: 1,
                 title: title.into(),
                 description: description.into(),
+                ..test_certificate_dto()
             })
             .to_request()
     };
@@ -180,6 +195,7 @@ async fn owner_can_edit_their_certificate_but_another_user_cannot_change_it() {
                 id: 1,
                 title: String::new(),
                 description: String::new(),
+                ..test_certificate_dto()
             })
             .to_request(),
     )
@@ -210,6 +226,7 @@ async fn owner_can_delete_their_certificate_but_another_user_cannot_delete_it() 
                 id: 0,
                 title: "Owner certificate".into(),
                 description: "Protected".into(),
+                ..test_certificate_dto()
             })
             .to_request(),
     )
@@ -223,6 +240,7 @@ async fn owner_can_delete_their_certificate_but_another_user_cannot_delete_it() 
                 id: 1,
                 title: String::new(),
                 description: String::new(),
+                ..test_certificate_dto()
             })
             .to_request()
     };
@@ -238,6 +256,7 @@ async fn owner_can_delete_their_certificate_but_another_user_cannot_delete_it() 
                 id: 1,
                 title: String::new(),
                 description: String::new(),
+                ..test_certificate_dto()
             })
             .to_request(),
     )
@@ -260,6 +279,7 @@ async fn owner_can_delete_their_certificate_but_another_user_cannot_delete_it() 
                 id: 1,
                 title: String::new(),
                 description: String::new(),
+                ..test_certificate_dto()
             })
             .to_request(),
     )

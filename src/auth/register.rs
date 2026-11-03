@@ -10,12 +10,13 @@ pub async fn register(body: web::Json<User>, db: web::Data<Mutex<Connection>>) -
     let db = db.lock().unwrap();
 
     let mut statement = db
-        .prepare("INSERT INTO users (name, password) VALUES (?, ?)")
+        .prepare("INSERT INTO users (name, password, email) VALUES (?, ?, ?)")
         .unwrap();
 
     let result = statement
         .bind((1, body.name.as_str()))
         .and_then(|_| statement.bind((2, body.password.as_str())))
+        .and_then(|_| statement.bind((3, body.email.as_deref())))
         .and_then(|_| statement.next());
 
     match result {

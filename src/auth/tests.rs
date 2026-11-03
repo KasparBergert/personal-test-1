@@ -7,6 +7,7 @@ async fn registered_user_can_log_in_and_receive_tokens() {
     let user = User {
         name: "test-user".into(),
         password: "test-password".into(),
+        email: Some("test@example.com".into()),
     };
 
     let response = test::call_service(
