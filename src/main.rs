@@ -7,7 +7,6 @@ mod test_utils;
 
 use actix_web::{
     App, HttpServer,
-    cookie::time::format_description::well_known::iso8601::FormattedComponents::DateTime,
     middleware::from_fn, web,
 };
 use auth::{jwt_auth, login, register};
@@ -17,18 +16,8 @@ use certificate::{
 use chrono::{Local, Timelike};
 use db::DB_INIT;
 use notification::send_expiry_notifications;
-use reqwest::{Error, Response};
-use serde::{Deserialize, Serialize};
-use sqlite::Connection;
-use std::{
-    sync::Mutex,
-    thread,
-    time::{SystemTime, UNIX_EPOCH},
-    vec,
-};
-use tokio::spawn;
+use std::sync::Mutex;
 
-use crate::{auth::User, certificate::Certificate};
 
 //email of user and certificate
 
